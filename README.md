@@ -1,6 +1,6 @@
-Small battleship game vs CPU
-on React + Vite + MaterialUI
+# Small battleship game vs CPU
+### Made on React + Vite + MaterialUI
 
-Instructions
-npm install
-npm run dev
+## Instructions:
+#### npm install
+#### npm run dev
