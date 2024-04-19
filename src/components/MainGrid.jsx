@@ -73,7 +73,7 @@ const MainGrid = (props) => {
           return (
             <BattleField
               onClick={() => {
-                props.owner == "Enemy" && !store.gameEnded ?  actions.handleAttack(0, i) : {};
+                props.owner == "Enemy" && (!store.gameEnded && store.foggyField[0][i]==4) ?  actions.handleAttack(0, i) : {};
               }}
               key={"A" + i}
               bgcolor={
@@ -99,7 +99,7 @@ const MainGrid = (props) => {
           return (
             <BattleField
               onClick={() => {
-                props.owner == "Enemy" && !store.gameEnded ? actions.handleAttack(1, i) : {};
+                props.owner == "Enemy" && (!store.gameEnded && store.foggyField[1][i]==4) ? actions.handleAttack(1, i) : {};
               }}
               key={"B" + i}
               bgcolor={
@@ -125,7 +125,7 @@ const MainGrid = (props) => {
           return (
             <BattleField
               onClick={() => {
-                props.owner == "Enemy" && !store.gameEnded ? actions.handleAttack(2, i) : {};
+                props.owner == "Enemy" && (!store.gameEnded && store.foggyField[2][i]==4) ? actions.handleAttack(2, i) : {};
               }}
               key={"C" + i}
               bgcolor={
@@ -151,7 +151,7 @@ const MainGrid = (props) => {
           return (
             <BattleField
               onClick={() => {
-                props.owner == "Enemy" && !store.gameEnded ? actions.handleAttack(3, i) : {};
+                props.owner == "Enemy" && (!store.gameEnded && store.foggyField[3][i]==4) ? actions.handleAttack(3, i) : {};
               }}
               key={"D" + i}
               bgcolor={
@@ -177,7 +177,7 @@ const MainGrid = (props) => {
           return (
             <BattleField
               onClick={() => {
-                props.owner == "Enemy" && !store.gameEnded ? actions.handleAttack(4, i) : {};
+                props.owner == "Enemy" && (!store.gameEnded && store.foggyField[4][i]==4) ? actions.handleAttack(4, i) : {};
               }}
               key={"E" + i}
               bgcolor={
@@ -203,7 +203,7 @@ const MainGrid = (props) => {
           return (
             <BattleField
               onClick={() => {
-                props.owner == "Enemy" && !store.gameEnded ? actions.handleAttack(5, i) : {};
+                props.owner == "Enemy" && (!store.gameEnded && store.foggyField[5][i]==4) ? actions.handleAttack(5, i) : {};
               }}
               key={"F" + i}
               bgcolor={
@@ -229,7 +229,7 @@ const MainGrid = (props) => {
           return (
             <BattleField
               onClick={() => {
-                props.owner == "Enemy" && !store.gameEnded ? actions.handleAttack(6, i) : {};
+                props.owner == "Enemy" && (!store.gameEnded && store.foggyField[6][i]==4) ? actions.handleAttack(6, i) : {};
               }}
               key={"G" + i}
               bgcolor={
@@ -255,7 +255,7 @@ const MainGrid = (props) => {
           return (
             <BattleField
               onClick={() => {
-                props.owner == "Enemy" && !store.gameEnded ? actions.handleAttack(7, i) : {};
+                props.owner == "Enemy" && (!store.gameEnded && store.foggyField[7][i]==4) ? actions.handleAttack(7, i) : {};
               }}
               key={"H" + i}
               bgcolor={
@@ -281,7 +281,7 @@ const MainGrid = (props) => {
           return (
             <BattleField
               onClick={() => {
-                props.owner == "Enemy" && !store.gameEnded ? actions.handleAttack(8, i) : {};
+                props.owner == "Enemy" &&(!store.gameEnded && store.foggyField[8][i]==4) ? actions.handleAttack(8, i) : {};
               }}
               key={"I" + i}
               bgcolor={
@@ -307,7 +307,7 @@ const MainGrid = (props) => {
           return (
             <BattleField
               onClick={() => {
-                props.owner == "Enemy" && !store.gameEnded ? actions.handleAttack(9, i) : {};
+                props.owner == "Enemy" && (!store.gameEnded && store.foggyField[9][i]==4) ? actions.handleAttack(9, i) : {};
               }}
               key={"J" + i}
               bgcolor={
