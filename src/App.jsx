@@ -7,27 +7,41 @@ import MainGrid from "./components/MainGrid.jsx";
 import toast, { Toaster } from "react-hot-toast";
 import { Box } from "@mui/material";
 import SetupGrid from "./components/SetupGrid.jsx";
+import {useWindowSize} from '@uidotdev/usehooks'
+import Confetti from 'react-confetti'
 
 function App() {
   const { store, actions } = useContext(Context);
   const [count, setCount] = useState(0);
-
-  useEffect(() => {}, [store.gameStarted]);
+  const { width, height } = useWindowSize()
 
   return (
     <>
-      <Container maxWidth="false" sx={{ height: "100vh", my: 5, mx: "auto" }}>
+      <Confetti
+      numberOfPieces={store.youWon?200:0}
+      width={width}
+      height={height}
+    />
+      <Container maxWidth="false" sx={{ height: "auto", my: 5, mx: "auto" }}>
         <Grid container sx={{ alignItems: "center" }}>
           <Typography variant="h2" component="h2" sx={{ mb: 2 }}>
             Battleships
           </Typography>
           <Button
-            sx={{ height: 50, mx: 4 }}
+            sx={{ height: 50, mx: 2 }}
             variant="outlined"
             onClick={() => actions.handleRestart()}
           >
             Restart game!
           </Button>
+          {store.gameStarted&&
+          <Button
+            sx={{ height: 40, mx: 2 }}
+            variant="outlined"
+            onClick={() => actions.toggleSecret()}
+          >
+            Toggle enemy field view
+          </Button>}
         </Grid>
         <Box height={150}>
           <Typography variant="subtitle1">
@@ -63,12 +77,13 @@ function App() {
             </Box>
           )}
         </Box>
-
+        {store.showSecret?<MainGrid owner="EnemySecret" xl={6}/>:<></>}
         <Grid container gap={4} columns={{ l: 12, md: 10 }}>
           {store.gameStarted === true ? (
             <>
               <MainGrid owner="Enemy" xl={6} />
               <MainGrid owner="Your" xl={6} />
+              
             </>
           ) : (
             <SetupGrid owner="Setup your" />

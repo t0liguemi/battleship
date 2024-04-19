@@ -6,7 +6,7 @@ import { Context } from "../store/context.jsx";
 
 const MainGrid = (props) => {
   const { store, actions } = useContext(Context);
-  let fields = props.owner == "Enemy" ? store.foggyField : store.blankField;
+  let fields = props.owner == "Enemy" ?  store.foggyField : props.owner == "EnemySecret"? store.enemyField : store.blankField;
 
   const CustomHeader = ({ children, ...props }) => {
     return (

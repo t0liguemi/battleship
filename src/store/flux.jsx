@@ -16,7 +16,9 @@ function randomax(max) {
 const getState = ({ getStore, getActions, setStore }) => {
   return {
     store: {
-      gameEnded:false,
+      youWon:false,
+      showSecret: false,
+      gameEnded: false,
       gameStarted: false,
       shipsReady: false,
       waitingForShip: false,
@@ -61,15 +63,15 @@ const getState = ({ getStore, getActions, setStore }) => {
       ],
       enemyField: [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [2, 2, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 2, 0, 0],
-        [0, 0, 2, 0, 0, 0, 0, 2, 0, 0],
-        [0, 0, 2, 0, 0, 0, 0, 2, 0, 0],
-        [0, 0, 2, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 2, 0, 2, 2, 2, 2, 2, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 2, 2, 2, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       ],
       //The cpu searches here to shoot to a suspicious field (ship), and know when a ship is sunk
       cpuKnowledge: { water: [], ships: [], wreck: [] },
@@ -115,6 +117,11 @@ const getState = ({ getStore, getActions, setStore }) => {
       },
     },
     actions: {
+      toggleSecret: () => {
+        const store = getStore();
+        let secret = !store.showSecret;
+        setStore({ showSecret: secret });
+      },
       setBoatStart: (x, y, length) => {
         const store = getStore();
         let blankField = store.blankField;
@@ -130,15 +137,18 @@ const getState = ({ getStore, getActions, setStore }) => {
 
       setBoatEnd: (x, y) => {
         const store = getStore();
+        const actions = getActions();
         let blankField = store.blankField;
         if (
           store.currentShipStart[0] === x &&
           store.currentShipStart[1] === y
         ) {
+          //delete the start
           blankField[x][y] = 0;
           setStore({ blankField });
           setStore({ waitingForShip: false });
         } else if (
+          //check the range is non diagonal and of the length
           (store.currentShipStart[0] !== x ||
             store.currentShipStart[1] !== y) &&
           (store.currentShipStart[0] === x ||
@@ -150,6 +160,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             store.currentBoat - 1
         ) {
           if (blankField[x][y] !== 0) {
+            //check if the selected spot is water
             toast.error("You must place the end on water");
             return;
           }
@@ -204,6 +215,7 @@ const getState = ({ getStore, getActions, setStore }) => {
           });
           if (store.boatsPlaced === 3) {
           } else if (store.boatsPlaced == 5) {
+            actions.cpuFieldSetup();
             setStore({ gameStarted: true, shipsReady: true });
           } else {
             setStore({ currentBoat: store.currentBoat - 1 });
@@ -245,7 +257,7 @@ const getState = ({ getStore, getActions, setStore }) => {
           }
           if (totalHitCounter === 17) {
             toast.success("You won!");
-            setStore({gameEnded:true})
+            setStore({ gameEnded: true, youWon:true });
           }
         } else {
           //Check if cpu sunk your ship
@@ -279,7 +291,7 @@ const getState = ({ getStore, getActions, setStore }) => {
           }
           if (totalHitCounter === 17) {
             toast.error("You lost!");
-            setStore({gameEnded:true})
+            setStore({ gameEnded: true });
           }
         }
       },
@@ -304,23 +316,17 @@ const getState = ({ getStore, getActions, setStore }) => {
 
       handleRestart: () => {
         setStore({
-          gameEnded:false,
+          youWon:false,
+          showSecret: false,
+          gameEnded: false,
           gameStarted: false,
-          shipsReady:false,
+          shipsReady: false,
           waitingForShip: false,
-          boatsPlaced:0,
-          currentBoat:5,
+          boatsPlaced: 0,
+          currentBoat: 5,
           cpuKnowledge: { water: [], ships: [], wreck: [] },
           cpuHits: [],
-          playerHits: [],
-          playerLocations: {
-            carrier: [],
-            battleship: [],
-            cruiser: [],
-            submarine: [],
-            destroyer: [],
-          },
-          blankField:[
+          enemyField: [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -332,7 +338,34 @@ const getState = ({ getStore, getActions, setStore }) => {
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
           ],
-          foggyField:[
+          playerHits: [],
+          playerLocations: {
+            carrier: [],
+            battleship: [],
+            cruiser: [],
+            submarine: [],
+            destroyer: [],
+          },
+          enemyLocations: {
+            carrier: [],
+            battleship: [],
+            cruiser: [],
+            submarine: [],
+            destroyer: [],
+          },
+          blankField: [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          ],
+          foggyField: [
             [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
             [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
             [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
@@ -345,7 +378,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
           ],
         });
-        console.log(getStore())
+        console.log(getStore());
       },
 
       handleIncomingAttack: (x, y) => {
@@ -610,60 +643,142 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
-      cpuFieldSetup:()=>{
-        //insert setup logic here
-      },
+      cpuFieldSetup: () => {
+        const store = getStore();
+        const actions = getActions();
+        const lengths = [5, 4, 3, 3, 2];
+        let currentLength;
+        let startX, startY, endX, endY;
+        let placedBoats = 0;
+        let enemyField = [
+          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        ];
+        let enemyLocations = {
+          carrier: [],
+          battleship: [],
+          cruiser: [],
+          submarine: [],
+          destroyer: [],
+        };
+        let enemyPositionsArray = [];
 
-      //UNUSED FOR NOW
-      checkIfXIsFull: (X) => {
-        const store = getStore();
-        let counter = 0;
-        for (let i = 0; i < 10; i++) {
+        const isValidStart = (x, y) => {
+          //check if the start is water
+          return (
+            x <= 9 &&
+            x >= 0 &&
+            y <= 9 &&
+            y >= 0 &&
+            !enemyPositionsArray.some(
+              (position) => position[0] === x && position[1] === y
+            )
+          );
+        };
+
+        const isValidEnd = (x, y) => {
+          //check if the end is water and doesnt cause collisions
+          let dx = Math.sign(x - startX);
+          let dy = Math.sign(y - startY);
           if (
-            store.cpuKnowledge.wreck.some(
-              (field) => field[0] == X && field[1] == i
-            ) ||
-            store.cpuKnowledge.water.some(
-              (field) => field[0] == X && field[1] == i
-            ) ||
-            store.cpuKnowledge.ships.some(
-              (field) => field[0] == X && field[1] == i
+            x <= 9 &&
+            x >= 0 &&
+            y <= 9 &&
+            y >= 0 &&
+            !enemyPositionsArray.some(
+              (position) => position[0] === x && position[1] === y
             )
           ) {
-            counter += 1;
+            for (let i = 0; i < currentLength - 1; i++) {
+              if (enemyField[x - i * dx][y - i * dy] !== 0) {
+                console.log("end", x, y, "overlaps");
+                return false;
+              }
+            }
+            console.log("end", x, y, "is valid");
+            return true;
+          }
+        };
+
+        function findStart() {
+          startX = undefined;
+          startY = undefined;
+          if (!isValidStart(startX, startY)) {
+            startX = randomax(10);
+            startY = randomax(10);
+          } else {
+            console.log("using start ", startX, startY);
           }
         }
-        if (counter == 10) {
-          console.log("X is Full" + X);
-          return true;
-        } else {
-          return false;
-        }
-      },
-      checkIfYIsFull: (Y) => {
-        const store = getStore();
-        let counter = 0;
-        for (let i = 0; i < 10; i++) {
-          if (
-            store.cpuKnowledge.wreck.some(
-              (field) => field[0] == i && field[1] == Y
-            ) ||
-            store.cpuKnowledge.water.some(
-              (field) => field[0] == i && field[1] == Y
-            ) ||
-            store.cpuKnowledge.ships.some(
-              (field) => field[0] == i && field[1] == Y
-            )
-          ) {
-            counter += 1;
+
+        for (let i = 0; i < 5; i++) {
+          currentLength = lengths[i];
+          console.log("finding a place for boat of length", currentLength);
+          let attempts = 0; //if 4 directions of the end dont work remake the start
+          findStart();
+          while (!isValidEnd(endX, endY)) {
+            if (randomize() > 0) {
+              //decide : + horizonal - vertical
+              let dy = randomize(); //decide if right or left
+              endX = startX;
+              endY = startY - 1 + dy * currentLength;
+            } else {
+              let dx = randomize(); //decide if up or down
+              endX = startX - 1 + dx * currentLength;
+              endY = startY;
+            }
+            attempts += 1;
+            if (attempts === 8) {
+              //give it 8 attempts to find a valid end and if not change the start
+              console.log("failed to find end, changing start");
+              findStart();
+            }
+          }
+          console.log("spot found from", startX, startY, "to", endX, endY);
+          placedBoats += 1;
+          let dx = Math.sign(endX - startX);
+          let dy = Math.sign(endY - startY);
+
+          for (let i = 0; i < currentLength; i++) {
+            //painting enemyField with the ships
+            enemyField[endX - i * dx][endY] = 2;
+            enemyField[endX][endY - i * dy] = 2;
+          }
+
+          //Adding to enemy locations
+
+          if (placedBoats == 1) {
+            for (let i = 0; i < 5; i++) {
+              enemyLocations.carrier.push([endX - i * dx, endY - i * dy]);
+            }
+          } else if (placedBoats == 2) {
+            for (let i = 0; i < 4; i++) {
+              enemyLocations.battleship.push([endX - i * dx, endY - i * dy]);
+            }
+          } else if (placedBoats == 3) {
+            for (let i = 0; i < 3; i++) {
+              enemyLocations.cruiser.push([endX - i * dx, endY - i * dy]);
+            }
+          } else if (placedBoats == 4) {
+            for (let i = 0; i < 3; i++) {
+              enemyLocations.submarine.push([endX - i * dx, endY - i * dy]);
+            }
+          } else if (placedBoats == 5) {
+            for (let i = 0; i < 2; i++) {
+              enemyLocations.destroyer.push([endX - i * dx, endY - i * dy]);
+            }
           }
         }
-        if (counter == 10) {
-          console.log("Y es full" + Y);
-          return true;
-        } else {
-          false;
-        }
+        setStore({ enemyField, enemyLocations });
+        console.log(getStore());
       },
     },
   };
